@@ -62,7 +62,7 @@ def run_client():
                     raise IllegalMessageException()
                 else:
                     print()
-                    print(idea.decrypt(file_text_response.encrypted_text, session_key))
+                    print(idea.decrypt(file_text_response.encrypted_text, session_key, file_text_response.initialization_list))
                     print()
             elif operation == 3:
                 break

@@ -49,8 +49,8 @@ def handle_client(conn, addr):
 
                 file_name = request.file_name
                 file_text = read_file(FILES_DIRECTORY_PATH + file_name)
-                encrypted_file_text = idea.encrypt(file_text, session_key)
-                send_msg(conn, Message.to_bytes(GetFileTextResponse(encrypted_file_text)))
+                encrypted_file_text, initialization_list = idea.encrypt(file_text, session_key)
+                send_msg(conn, Message.to_bytes(GetFileTextResponse(encrypted_file_text, initialization_list)))
             else:
                 raise IllegalMessageException()
 

@@ -118,17 +118,24 @@ class GetFileTextResponse(BaseMessage):
     MESSAGE_TYPE = RESPONSE_FILE_TEXT_MESSAGE_TYPE
 
     _ENCRYPTED_TEXT_KEY = 'encrypted_text'
+    _INITIALIZATION_LIST_KEY = 'initialization_list'
 
-    def __init__(self, encrypted_text):
+    def __init__(self, encrypted_text, initialization_list):
         self._encrypted_text = encrypted_text
+        self._initialization_list = initialization_list
 
     @property
     def encrypted_text(self):
         return self._encrypted_text
 
+    @property
+    def initialization_list(self):
+        return self._initialization_list
+
     def to_dict(self):
         message_dict = super().to_dict()
         message_dict[GetFileTextResponse._ENCRYPTED_TEXT_KEY] = self._encrypted_text
+        message_dict[GetFileTextResponse._INITIALIZATION_LIST_KEY] = self._initialization_list
         return message_dict
 
     @classmethod
@@ -137,7 +144,10 @@ class GetFileTextResponse(BaseMessage):
             if GetFileTextResponse._ENCRYPTED_TEXT_KEY not in message_dict:
                 raise WrongFormatException()
 
-            return cls(message_dict[GetFileTextResponse._ENCRYPTED_TEXT_KEY])
+            if GetFileTextResponse._INITIALIZATION_LIST_KEY not in message_dict:
+                raise WrongFormatException()
+
+            return cls(message_dict[GetFileTextResponse._ENCRYPTED_TEXT_KEY], message_dict[GetFileTextResponse._INITIALIZATION_LIST_KEY])
 
         raise WrongFormatException()
 

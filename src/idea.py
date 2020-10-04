@@ -3,8 +3,8 @@ def generate_key():
 
 
 def encrypt(text, key):
-    return text
+    return text, [1, 0, 1]
 
 
-def decrypt(text, key):
+def decrypt(text, key, initialization_list):
     return text
