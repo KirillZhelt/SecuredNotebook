@@ -2,6 +2,8 @@ HELLO_MESSAGE_TYPE = 'HELLO'
 SEND_RSA_OPEN_KEY_MESSAGE_TYPE = 'SEND_RSA_OPEN_KEY'
 REQUEST_SESSION_KEY_MESSAGE_TYPE = 'REQUEST_SESSION_KEY'
 RESPONSE_SESSION_KEY_MESSAGE_TYPE = 'RESPONSE_SESSION_KEY'
+REQUEST_FILE_NAMES_MESSAGE_TYPE = 'REQUEST_FILE_NAMES'
+RESPONSE_FILE_NAMES_MESSAGE_TYPE = 'RESPONSE_FILE_NAMES'
 REQUEST_FILE_TEXT_MESSAGE_TYPE = 'REQUEST_FILE_TEXT'
 RESPONSE_FILE_TEXT_MESSAGE_TYPE = 'RESPONSE_FILE_TEXT'
 SERVER_OK_MESSAGE_TYPE = 'SERVER_OK'
@@ -85,6 +87,36 @@ class GetSessionKeyResponse(BaseMessage):
 
         raise WrongFormatException()
 
+
+class GetFileNamesRequest(BaseMessage):
+    MESSAGE_TYPE = REQUEST_FILE_NAMES_MESSAGE_TYPE
+
+
+class GetFileNamesResponse(BaseMessage):
+    MESSAGE_TYPE = RESPONSE_FILE_NAMES_MESSAGE_TYPE
+    _FILE_NAMES_KEY = 'file_names' 
+
+    def __init__(self, file_names):
+        self._file_names = file_names
+
+    @property
+    def file_names(self):
+        return self._file_names
+
+    def to_dict(self):
+        message_dict = super().to_dict()
+        message_dict[GetFileNamesResponse._FILE_NAMES_KEY] = self._file_names
+        return message_dict
+
+    @classmethod
+    def from_dict(cls, message_dict):
+        if message_dict[MESSAGE_TYPE_KEY] == GetFileNamesResponse.MESSAGE_TYPE:
+            if GetFileNamesResponse._FILE_NAMES_KEY not in message_dict:
+                raise WrongFormatException()
+
+            return cls(message_dict[GetFileNamesResponse._FILE_NAMES_KEY])
+
+        raise WrongFormatException()
 
 class GetFileTextRequest(BaseMessage):
     MESSAGE_TYPE = REQUEST_FILE_TEXT_MESSAGE_TYPE
@@ -177,6 +209,10 @@ class Message:
             return GetFileTextResponse.from_dict(message_dict)
         elif message_type == SERVER_OK_MESSAGE_TYPE:
             return ServerOkResponse.from_dict(message_dict)
+        elif message_type == REQUEST_FILE_NAMES_MESSAGE_TYPE:
+            return GetFileNamesRequest.from_dict(message_dict)
+        elif message_type == RESPONSE_FILE_NAMES_MESSAGE_TYPE:
+            return GetFileNamesResponse.from_dict(message_dict)
 
         raise WrongFormatException()
 

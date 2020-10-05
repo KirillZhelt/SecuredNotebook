@@ -1,5 +1,6 @@
 import socket
 import threading
+import os
 
 import rsa
 import idea
@@ -17,6 +18,10 @@ FILES_DIRECTORY_PATH = 'storage/'
 def read_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
+
+
+def get_file_names(files_dir_path):
+    return [entry.name for entry in os.scandir(files_dir_path) if entry.is_file()] 
 
 
 def handle_client(conn, addr):
@@ -51,6 +56,8 @@ def handle_client(conn, addr):
                 file_text = read_file(FILES_DIRECTORY_PATH + file_name)
                 encrypted_file_text, initialization_list = idea.encrypt(file_text, session_key)
                 send_msg(conn, Message.to_bytes(GetFileTextResponse(encrypted_file_text, initialization_list)))
+            elif isinstance(request, GetFileNamesRequest):
+                send_msg(conn, Message.to_bytes(GetFileNamesResponse(get_file_names(FILES_DIRECTORY_PATH))))
             else:
                 raise IllegalMessageException()
 

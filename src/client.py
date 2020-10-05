@@ -12,7 +12,8 @@ PORT = 11555
 
 MENU_MESSAGE = '''Enter 1 for regenerating a session key.
 Enter 2 for requesting a file text.
-Enter 3 for exit.
+Enter 3 for requesting file names.
+Enter 4 for exit.
 Choose operation: '''
 ENTER_FILE_NAME_TEXT = '''Enter file name: '''
 
@@ -65,6 +66,14 @@ def run_client():
                     print(idea.decrypt(file_text_response.encrypted_text, session_key, file_text_response.initialization_list))
                     print()
             elif operation == 3:
+                file_names_response = send_request(s, GetFileNamesRequest())
+                if not isinstance(file_names_response, GetFileNamesResponse):
+                    raise IllegalMessageException()
+                else:
+                    print()
+                    print(file_names_response.file_names)
+                    print()
+            elif operation == 4:
                 break
 
 
