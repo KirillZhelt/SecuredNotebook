@@ -1,7 +1,10 @@
 HELLO_MESSAGE_TYPE = 'HELLO'
 SEND_OPEN_KEY_MESSAGE_TYPE = 'SEND_OPEN_KEY'
 REQUEST_SESSION_KEY_MESSAGE_TYPE = 'REQUEST_SESSION_KEY'
+REQUEST_SEND_PASSWORD_TYPE = 'REQUEST_SEND_PASSWORD'
+RESPONSE_WRONG_PASSWORD_TYPE = 'REQUEST_WRONG_PASSWORD'
 RESPONSE_SESSION_KEY_MESSAGE_TYPE = 'RESPONSE_SESSION_KEY'
+RESPONSE_SESSION_KEY_EXPIRED_TYPE = 'RESPONSE_SESSION_KEY_EXPIRED'
 REQUEST_FILE_NAMES_MESSAGE_TYPE = 'REQUEST_FILE_NAMES'
 RESPONSE_FILE_NAMES_MESSAGE_TYPE = 'RESPONSE_FILE_NAMES'
 REQUEST_FILE_TEXT_MESSAGE_TYPE = 'REQUEST_FILE_TEXT'
@@ -28,6 +31,38 @@ class BaseMessage:
 
 class ClientHelloRequest(BaseMessage): 
     MESSAGE_TYPE = HELLO_MESSAGE_TYPE
+
+
+class SendPasswordRequest(BaseMessage):
+    MESSAGE_TYPE = REQUEST_SEND_PASSWORD_TYPE
+
+    _PASSWORD_KEY = 'password'
+
+    def __init__(self, password):
+        self._password = password
+
+    @property
+    def password(self):
+        return self._password
+
+    def to_dict(self):
+        message_dict = super().to_dict()
+        message_dict[SendPasswordRequest._PASSWORD_KEY] = self._password
+        return message_dict
+
+    @classmethod
+    def from_dict(cls, message_dict):
+        if message_dict[MESSAGE_TYPE_KEY] == SendPasswordRequest.MESSAGE_TYPE:
+            if SendPasswordRequest._PASSWORD_KEY not in message_dict:
+                raise WrongFormatException()
+
+            return cls(message_dict[SendPasswordRequest._PASSWORD_KEY])
+
+        raise WrongFormatException()
+
+
+class WrongPasswordResponse(BaseMessage): 
+    MESSAGE_TYPE = RESPONSE_WRONG_PASSWORD_TYPE
 
 
 class SendOpenKeyRequest(BaseMessage):
@@ -87,9 +122,11 @@ class GetSessionKeyResponse(BaseMessage):
 
         raise WrongFormatException()
 
-
 class GetFileNamesRequest(BaseMessage):
     MESSAGE_TYPE = REQUEST_FILE_NAMES_MESSAGE_TYPE
+
+class SessionKeyExpiredResponse(BaseMessage):
+    MESSAGE_TYPE = RESPONSE_SESSION_KEY_EXPIRED_TYPE
 
 
 class GetFileNamesResponse(BaseMessage):
@@ -213,6 +250,12 @@ class Message:
             return GetFileNamesRequest.from_dict(message_dict)
         elif message_type == RESPONSE_FILE_NAMES_MESSAGE_TYPE:
             return GetFileNamesResponse.from_dict(message_dict)
+        elif message_type == RESPONSE_SESSION_KEY_EXPIRED_TYPE:
+            return SessionKeyExpiredResponse.from_dict(message_dict)
+        elif message_type == REQUEST_SEND_PASSWORD_TYPE:
+            return SendPasswordRequest.from_dict(message_dict)
+        elif message_type == RESPONSE_WRONG_PASSWORD_TYPE:
+            return WrongPasswordResponse.from_dict(message_dict)
 
         raise WrongFormatException()
 
