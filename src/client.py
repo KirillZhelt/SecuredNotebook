@@ -1,6 +1,6 @@
 import socket
 
-import rsa
+import gm
 import idea
 
 from protocol import *
@@ -43,18 +43,18 @@ def run_client():
         hello_response = send_request(s, ClientHelloRequest())
         check_ok_response(hello_response, 'ClientHello')
 
-        open_rsa_key, closed_rsa_key = rsa.generate_keys()
-        send_rsa_key_response = send_request(s, SendRSAOpenKeyRequest(open_rsa_key))
-        check_ok_response(send_rsa_key_response, 'SendRSAOpenKeyRequest')
+        open_gm_key, closed_gm_key = gm.generate_keys()
+        send_gm_key_response = send_request(s, SendOpenKeyRequest(open_gm_key))
+        check_ok_response(send_gm_key_response, 'SendOpenKeyRequest')
 
-        session_key = rsa.decrypt(request_session_key(s), closed_rsa_key) 
+        session_key = gm.decrypt(request_session_key(s), closed_gm_key) 
 
         while True:
             operation = int(input(MENU_MESSAGE))
 
             if operation == 1:
                 # refresh session key
-                session_key = rsa.decrypt(request_session_key(s), closed_rsa_key) 
+                session_key = gm.decrypt(request_session_key(s), closed_gm_key) 
             elif operation == 2:
                 # get file text
                 file_name = input(ENTER_FILE_NAME_TEXT)

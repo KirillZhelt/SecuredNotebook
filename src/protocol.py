@@ -1,5 +1,5 @@
 HELLO_MESSAGE_TYPE = 'HELLO'
-SEND_RSA_OPEN_KEY_MESSAGE_TYPE = 'SEND_RSA_OPEN_KEY'
+SEND_OPEN_KEY_MESSAGE_TYPE = 'SEND_OPEN_KEY'
 REQUEST_SESSION_KEY_MESSAGE_TYPE = 'REQUEST_SESSION_KEY'
 RESPONSE_SESSION_KEY_MESSAGE_TYPE = 'RESPONSE_SESSION_KEY'
 REQUEST_FILE_NAMES_MESSAGE_TYPE = 'REQUEST_FILE_NAMES'
@@ -30,8 +30,8 @@ class ClientHelloRequest(BaseMessage):
     MESSAGE_TYPE = HELLO_MESSAGE_TYPE
 
 
-class SendRSAOpenKeyRequest(BaseMessage):
-    MESSAGE_TYPE = SEND_RSA_OPEN_KEY_MESSAGE_TYPE
+class SendOpenKeyRequest(BaseMessage):
+    MESSAGE_TYPE = SEND_OPEN_KEY_MESSAGE_TYPE
 
     _OPEN_KEY_KEY = 'open_key'
 
@@ -44,16 +44,16 @@ class SendRSAOpenKeyRequest(BaseMessage):
 
     def to_dict(self):
         message_dict = super().to_dict()
-        message_dict[SendRSAOpenKeyRequest._OPEN_KEY_KEY] = self._open_key
+        message_dict[SendOpenKeyRequest._OPEN_KEY_KEY] = self._open_key
         return message_dict
 
     @classmethod
     def from_dict(cls, message_dict):
-        if message_dict[MESSAGE_TYPE_KEY] == SendRSAOpenKeyRequest.MESSAGE_TYPE:
-            if SendRSAOpenKeyRequest._OPEN_KEY_KEY not in message_dict:
+        if message_dict[MESSAGE_TYPE_KEY] == SendOpenKeyRequest.MESSAGE_TYPE:
+            if SendOpenKeyRequest._OPEN_KEY_KEY not in message_dict:
                 raise WrongFormatException()
 
-            return cls(message_dict[SendRSAOpenKeyRequest._OPEN_KEY_KEY])
+            return cls(message_dict[SendOpenKeyRequest._OPEN_KEY_KEY])
 
         raise WrongFormatException()
 
@@ -197,8 +197,8 @@ class Message:
 
         if message_type == HELLO_MESSAGE_TYPE:
             return ClientHelloRequest.from_dict(message_dict)
-        elif message_type == SEND_RSA_OPEN_KEY_MESSAGE_TYPE:
-            return SendRSAOpenKeyRequest.from_dict(message_dict)
+        elif message_type == SEND_OPEN_KEY_MESSAGE_TYPE:
+            return SendOpenKeyRequest.from_dict(message_dict)
         elif message_type == REQUEST_SESSION_KEY_MESSAGE_TYPE:
             return GetSessionKeyRequest.from_dict(message_dict)
         elif message_type == RESPONSE_SESSION_KEY_MESSAGE_TYPE:

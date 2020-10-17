@@ -2,7 +2,7 @@ import socket
 import threading
 import os
 
-import rsa
+import gm
 import idea
 
 from protocol import *
@@ -34,11 +34,11 @@ def handle_client(conn, addr):
         else:
             send_msg(conn, Message.to_bytes(ServerOkResponse()))
 
-        rsa_request = Message.from_bytes(recv_msg(conn))
-        if not isinstance(rsa_request, SendRSAOpenKeyRequest):
+        gm_request = Message.from_bytes(recv_msg(conn))
+        if not isinstance(gm_request, SendOpenKeyRequest):
             raise IllegalMessageException()
         else:
-            open_rsa_key = rsa_request.open_key
+            open_gm_key = gm_request.open_key
             send_msg(conn, Message.to_bytes(ServerOkResponse()))
 
         session_key = None
@@ -46,7 +46,7 @@ def handle_client(conn, addr):
             request = Message.from_bytes(recv_msg(conn))
             if isinstance(request, GetSessionKeyRequest):
                 session_key = idea.generate_key()
-                encrypted_session_key = rsa.encrypt(session_key, open_rsa_key)
+                encrypted_session_key = gm.encrypt(session_key, open_gm_key)
                 send_msg(conn, Message.to_bytes(GetSessionKeyResponse(encrypted_session_key)))
             elif isinstance(request, GetFileTextRequest):
                 if not session_key:
